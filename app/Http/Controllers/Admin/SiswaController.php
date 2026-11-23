@@ -11,11 +11,32 @@ use App\Models\MemberSiswa;
 class SiswaController extends Controller
 {
     // 1. Halaman Tampil Data Siswa
-    public function index()
-    {
-        $siswas = MemberSiswa::with('pengguna')->latest()->paginate(10);
-        return view('admin.datasiswa', compact('siswas'));
+   public function index(Request $request)
+{
+    $query = MemberSiswa::with('pengguna');
+
+    // ✅ Fitur Search
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('nama', 'like', "%{$search}%")
+              ->orWhere('nisn', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
     }
+
+    // ✅ Fitur Filter Kelas
+    if ($request->filled('kelas')) {
+        $query->where('kelas', $request->kelas);
+    }
+
+    $siswas = $query->latest()->paginate(10)->withQueryString();
+
+    // ✅ Ambil daftar kelas unik buat dropdown filter
+    $daftarKelas = MemberSiswa::select('kelas')->distinct()->pluck('kelas');
+
+    return view('admin.datasiswa', compact('siswas', 'daftarKelas'));
+}
 
     // 2. Proses Import Excel
     public function import(Request $request)
@@ -38,4 +59,10 @@ class SiswaController extends Controller
         $siswa = MemberSiswa::with('pengguna')->findOrFail($id);
         return view('admin.datasiswa-detail', compact('siswa'));
     }
+    public function export()
+{
+    // Logic export Excel/CSV (Bisa pakai LaporanExport atau bikin baru)
+    // Untuk sementara, kita redirect balik aja
+    return back()->with('info', 'Fitur ekspor segera hadir.');
+}
 }

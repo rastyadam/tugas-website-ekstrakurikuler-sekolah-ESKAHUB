@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\DataSiswaController;
 use App\Http\Controllers\Admin\EkstrakurikulerController as AdminEkstrakurikulerController;
 use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\pelatihController;
+use App\Http\Controllers\Admin\ProfilController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\Pembina\DashboardController;
+use App\Http\Controllers\Pembina\DashboardController as PembinaDashboard;
+use App\Http\Controllers\Pembina\LaporanController as PembinaLaporanController;
 use App\Http\Controllers\Siswa\BerandaController;
 use App\Http\Controllers\Siswa\EkstrakurikulerController as SiswaEkstrakurikulerController;
 use App\Http\Controllers\Siswa\PendaftaranController;
@@ -17,28 +21,33 @@ use Illuminate\Support\Facades\Route;
 // =========================
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.process');
-
-// ✅ Tambahkan 'role:admin'
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     Route::view('/datasiswa', 'admin.datasiswa')->name('datasiswa.index');
-   
+    Route::get('/data-siswa/export', [DataSiswaController::class, 'export'])->name('datasiswa.export');
     Route::get('/adexstra', [AdminEkstrakurikulerController::class, 'index'])->name('adexstra');
     Route::post('/adexstra', [AdminEkstrakurikulerController::class, 'store'])->name('adexstra.store');
+    Route::get('/adexstra/export', [AdminEkstrakurikulerController::class, 'export'])
+        ->name('adexstra.export');
     Route::put('/adexstra/{id}', [AdminEkstrakurikulerController::class, 'update'])->name('adexstra.update');
     Route::delete('/adexstra/{id}', [AdminEkstrakurikulerController::class, 'destroy'])->name('adexstra.destroy');
-
+ 
     Route::get('/pembina', [pelatihController::class, 'index'])->name('pelatih');
     Route::post('/pembina', [pelatihController::class, 'store'])->name('pelatih.store');
     Route::put('/pembina/{id}', [pelatihController::class, 'update'])->name('pelatih.update');
     Route::delete('/pembina/{id}', [pelatihController::class, 'destroy'])->name('pelatih.destroy');
-
+Route::get('/datasiswa/export', [SiswaController::class, 'export'])->name('datasiswa.export');
      Route::get('/datasiswa', [SiswaController::class, 'index'])->name('datasiswa.index');
     Route::post('/datasiswa/import', [SiswaController::class, 'import'])->name('datasiswa.import');
 Route::get('/datasiswa/{id}', [SiswaController::class, 'show'])->name('datasiswa.show');
 
    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
    Route::get('/laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
+
+Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
+Route::put('/profil/update', [ProfilController::class, 'updateProfil'])->name('profil.update');
+Route::put('/profil/password', [ProfilController::class, 'updatePassword'])->name('profil.password');
+
 
 });
 
@@ -51,31 +60,44 @@ Route::post('/login-pembina', [AuthController::class, 'pembinaLogin'])->name('lo
 
 // ✅ Tambahkan 'role:pembina'
 Route::middleware(['auth', 'wajib.ganti', 'role:pembina'])->prefix('pembina')->name('pembina.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard-pembina');
-    Route::get('/pendaftar', [DashboardController::class, 'pendaftar'])->name('pendaftar');
-    Route::put('/pendaftar/{id}/status', [DashboardController::class, 'updateStatus'])->name('pendaftar.update-status');
+    Route::get('/dashboard', [PembinaDashboard::class, 'index'])->name('dashboard-pembina');
+    Route::get('/pendaftar', [PembinaDashboard::class, 'pendaftar'])->name('pendaftar');
+    Route::put('/pendaftar/{id}/status', [PembinaDashboard::class, 'updateStatus'])->name('pendaftar.update-status');
      // Atur Jadwal Seleksi
-    Route::post('/pendaftar/{id}/jadwal', [DashboardController::class, 'simpanJadwalSeleksi'])->name('pendaftar.jadwal');
+    Route::post('/pendaftar/{id}/jadwal', [PembinaDashboard::class, 'simpanJadwalSeleksi'])->name('pendaftar.jadwal');
     
     // Terima Langsung (Tanpa Seleksi)
-    Route::put('/pendaftar/{id}/terima-langsung', [DashboardController::class, 'terimaLangsung'])->name('pendaftar.terima-langsung');
-    Route::post('/pengumuman', [DashboardController::class, 'simpanPengumuman'])->name('pengumuman.store');
+    Route::put('/pendaftar/{id}/terima-langsung', [PembinaDashboard::class, 'terimaLangsung'])->name('pendaftar.terima-langsung');
+    Route::post('/pengumuman', [PembinaDashboard::class, 'simpanPengumuman'])->name('pengumuman.store');
     
         // Halaman Atur Jadwal Latihan
-    Route::get('/jadwal-latihan', [DashboardController::class, 'jadwalLatihan'])->name('jadwal-latihan');
-    Route::post('/jadwal-latihan/{id}', [DashboardController::class, 'simpanJadwalLatihan'])->name('jadwal-latihan.store');
+    Route::get('/jadwal-latihan', [PembinaDashboard::class, 'jadwalLatihan'])->name('jadwal-latihan');
+    Route::post('/jadwal-latihan/{id}', [PembinaDashboard::class, 'simpanJadwalLatihan'])->name('jadwal-latihan.store');
 
 
     // Halaman Kelola Pengumuman
-    Route::get('/pengumuman', [DashboardController::class, 'pengumuman'])->name('pengumuman');
+    Route::get('/pengumuman', [PembinaDashboard::class, 'pengumuman'])->name('pengumuman');
     // Simpan Pengumuman
-    Route::post('/pengumuman', [DashboardController::class, 'simpanPengumuman'])->name('pengumuman.store');
+    Route::post('/pengumuman', [PembinaDashboard::class, 'simpanPengumuman'])->name('pengumuman.store');
 
-       Route::get('/anggota', [DashboardController::class, 'anggota'])->name('anggota');
+       Route::get('/anggota', [PembinaDashboard::class, 'anggota'])->name('anggota');
 
-       Route::get('/anggota/export', [DashboardController::class, 'exportAnggota'])->name('anggota.export');
+       Route::get('/anggota/export', [PembinaDashboard::class, 'exportAnggota'])->name('anggota.export');
+
+Route::get('/laporan', [PembinaLaporanController::class, 'index'])
+    ->name('laporan');
+
+    Route::get('/laporan/pdf', [PembinaLaporanController::class, 'exportPdf'])
+    ->name('laporan.pdf');
+
+// Profil Pembina
+Route::get('/profil', [PembinaDashboard::class, 'profil'])->name('profil');
+Route::put('/profil/update', [PembinaDashboard::class, 'updateProfil'])->name('profil.update');
+Route::put('/profil/password', [PembinaDashboard::class, 'updatePassword'])->name('profil.password');
+
 
 });
+
    
 
 // =========================

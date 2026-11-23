@@ -2,19 +2,17 @@
 
 @section('title', 'Laporan Admin - EskaHub')
 
-@section('content')
-<div class="max-w-7xl mx-auto p-6 space-y-6">
+@section('header-title')
+    <h1 class="text-[28px] font-bold tracking-tight text-[#14212E] leading-tight">
+        Laporan Aktivitas & Ekstrakurikuler
+    </h1>
+    <p class="mt-1 text-sm font-normal text-[#475361]">
+        Rekapitulasi terpadu pendaftaran siswa dan kehadiran ekstrakurikuler.
+    </p>
+@endsection
 
-    {{-- HEADER SECTION --}}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 pb-4">
-        <div>
-            <h1 class="text-2xl font-bold text-[#1a2b4c] tracking-tight">Laporan Aktivitas & Ekstrakurikuler</h1>
-            <p class="text-sm text-slate-500 mt-1">Rekapitulasi terpadu pendaftaran siswa dan kehadiran ekstrakurikuler.</p>
-        </div>
-        <a href="{{ route('admin.laporan.export') }}" class="flex items-center gap-2 px-4 py-2 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg text-sm font-semibold transition">
-    <i class="fa-solid fa-download"></i> Unduh Rekap Bulanan
-</a>
-    </div>
+@section('content')
+<div class="mt-4 space-y-6">
 
     {{-- 4 KARTU STATISTIK DINAMIS --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -56,11 +54,11 @@
             
             <div class="flex items-center gap-2">
                 <button onclick="window.print()" class="flex items-center gap-1.5 px-3 py-1.5 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-md text-xs font-bold transition">
-    <i class="fa-regular fa-file-pdf"></i> PDF
-</button>
-               <a href="{{ route('admin.laporan.export') }}" class="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-200 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-md text-xs font-bold transition">
-    <i class="fa-regular fa-file-excel"></i> CSV
-</a>
+                    <i class="fa-regular fa-file-pdf"></i> PDF
+                </button>
+                <a href="{{ route('admin.laporan.export') }}" class="flex items-center gap-1.5 px-3 py-1.5 border border-emerald-200 text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-md text-xs font-bold transition">
+                    <i class="fa-regular fa-file-excel"></i> CSV
+                </a>
                 <a href="{{ route('admin.laporan') }}" class="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a2b4c] hover:bg-[#0f1c33] text-white rounded-md text-xs font-bold transition shadow-sm">
                     <i class="fa-solid fa-rotate"></i> Perbarui
                 </a>
@@ -78,7 +76,6 @@
                         <th class="py-3 px-5">PESERTA</th>
                         <th class="py-3 px-5">KEHADIRAN</th>
                         <th class="py-3 px-5">STATUS</th>
-                        <th class="py-3 px-5 text-center">AKSI</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 text-sm">
@@ -90,7 +87,7 @@
                         </td>
                         <td class="py-4 px-5">
                             <div class="flex items-center gap-2">
-                                <span class="h-2 w-2 rounded-full {{ $ekskul->status == 'aktif' ? 'bg-amber-400' : 'bg-gray-400' }}"></span>
+                                <span class="h-2 w-2 rounded-full {{ $ekskul->status == 'aktif' ? 'bg-emerald-500' : 'bg-gray-400' }}"></span>
                                 <span class="font-bold text-slate-800">{{ $ekskul->nama }}</span>
                             </div>
                         </td>
@@ -111,13 +108,10 @@
                                 <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">Nonaktif</span>
                             @endif
                         </td>
-                        <td class="py-4 px-5 text-center text-gray-400 hover:text-gray-700 cursor-pointer">
-                            <i class="fa-solid fa-download"></i>
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="py-10 text-center text-gray-500">
+                        <td colspan="6" class="py-10 text-center text-gray-500">
                             Belum ada data ekstrakurikuler untuk dilaporkan.
                         </td>
                     </tr>
