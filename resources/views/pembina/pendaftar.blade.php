@@ -1,183 +1,597 @@
+
 @extends('pembina.layouts.app')
 
-@section('content')
-<div class="p-6 max-w-6xl mx-auto space-y-6">
+@section('title', 'Pendaftar Baru')
+@section('header_title', '')
 
-    {{-- Alert --}}
+@section('content')
+
+<div class="max-w-7xl mx-auto space-y-5">
+
+    {{-- ALERT SUCCESS --}}
     @if(session('success'))
-        <div class="bg-emerald-100 text-emerald-700 p-4 rounded-xl text-sm font-semibold">
+        <div class="px-4 py-3 border border-green-200 bg-green-50 text-green-700 text-sm rounded-md">
             {{ session('success') }}
         </div>
     @endif
 
-    {{-- Header --}}
-    <div>
-        <h1 class="text-2xl font-bold text-slate-800">Daftar Pendaftar</h1>
-        <p class="text-sm text-slate-500">Kelola siswa yang mendaftar ke ekstrakurikuler yang Anda ampu.</p>
+    {{-- ALERT ERROR --}}
+    @if(session('error'))
+        <div class="px-4 py-3 border border-red-200 bg-red-50 text-red-700 text-sm rounded-md">
+            {{ session('error') }}
+        </div>
+    @endif
+
+
+    {{-- HEADER --}}
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+        <div>
+            <h1 class="text-xl font-semibold text-slate-900">
+                Pendaftar Baru
+            </h1>
+
+            <p class="text-xs text-gray-500 mt-1">
+                Mengelola permohonan kegiatan ekstrakurikuler yang masuk.
+            </p>
+        </div>
+
     </div>
 
-    {{-- Tabel --}}
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+    {{-- TABEL PENDAFTAR --}}
+    <div class="bg-white border border-gray-200 rounded-md overflow-hidden">
+
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+
+            <table class="w-full min-w-[850px] text-left border-collapse">
+
+                {{-- TABLE HEADER --}}
                 <thead>
-                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold tracking-wider text-slate-500 uppercase">
-                        <th class="py-3 px-4">Nama Siswa</th>
-                        <th class="py-3 px-4">Ekstrakurikuler</th>
-                        <th class="py-3 px-4">Berkas</th>
-                        <th class="py-3 px-4">Tanggal Daftar</th>
-                        <th class="py-3 px-4">Status</th>
-                        <th class="py-3 px-4 text-right">Aksi</th>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+
+                        <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                            Nama Pendaftar
+                        </th>
+
+                        <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                            Ekstrakurikuler
+                        </th>
+
+                        <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                            Berkas
+                        </th>
+
+                        <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                            Tanggal Pendaftaran
+                        </th>
+
+                        <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                            Status
+                        </th>
+
+                        <th class="px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500 text-center">
+                            Aksi
+                        </th>
+
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
+
+
+                {{-- TABLE BODY --}}
+                <tbody class="divide-y divide-gray-200">
+
                     @forelse($pendaftarans as $p)
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="py-3 px-4">
-                            <div class="font-semibold text-slate-800">{{ $p->member->nama ?? 'Siswa' }}</div>
-                            <div class="text-xs text-slate-400">{{ $p->member->nisn ?? '-' }}</div>
+
+                    <tr class="hover:bg-gray-50 transition-colors">
+
+                        {{-- NAMA PENDAFTAR --}}
+                        <td class="px-4 py-3">
+
+                            <p class="text-xs font-semibold text-slate-900">
+                                {{ $p->member->nama ?? 'Siswa' }}
+                            </p>
+
+                            <p class="text-[10px] text-gray-500 mt-1">
+                                {{ $p->member->nisn ?? '-' }}
+                            </p>
+
                         </td>
-                        <td class="py-3 px-4 font-medium text-slate-700">{{ $p->ekstrakurikuler->nama ?? '-' }}</td>
-                        <td class="py-3 px-4">
+
+
+                        {{-- EKSTRAKURIKULER --}}
+                        <td class="px-4 py-3 text-xs text-gray-600">
+                            {{ $p->ekstrakurikuler->nama ?? '-' }}
+                        </td>
+
+
+                        {{-- BERKAS --}}
+                        <td class="px-4 py-3">
+
                             @if($p->detailPersyaratan && $p->detailPersyaratan->berkas)
-                                <a href="{{ asset('storage/' . $p->detailPersyaratan->berkas) }}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-2 py-1 rounded">
-                                    <i class="fa-solid fa-file-pdf"></i> Lihat
+
+                                <a href="{{ asset('storage/' . $p->detailPersyaratan->berkas) }}"
+                                   target="_blank"
+                                   class="text-xs font-medium text-slate-700 hover:text-amber-700 underline underline-offset-2">
+
+                                    Lihat Berkas
+
                                 </a>
+
                             @else
-                                <span class="text-[11px] text-slate-400 italic">-</span>
+
+                                <span class="text-xs text-gray-400">
+                                    -
+                                </span>
+
                             @endif
+
                         </td>
-                        <td class="py-3 px-4 text-slate-500 text-xs">
-                            {{ \Carbon\Carbon::parse($p->tanggal_daftar)->format('d M Y') }}
+
+
+                        {{-- TANGGAL --}}
+                        <td class="px-4 py-3 text-xs text-gray-600">
+
+                            {{ $p->tanggal_daftar
+                                ? \Carbon\Carbon::parse($p->tanggal_daftar)->format('d M Y')
+                                : '-' }}
+
                         </td>
-                        <td class="py-3 px-4">
+
+
+                        {{-- STATUS --}}
+                        <td class="px-4 py-3">
+
                             @if($p->status == 'pending')
-                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800">Pending</span>
+
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-amber-100 text-amber-800">
+                                    Pending
+                                </span>
+
                             @elseif($p->status == 'diterima')
-                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">Diterima</span>
+
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-700">
+                                    Diterima
+                                </span>
+
                             @else
-                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800">Ditolak</span>
+
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-red-100 text-red-700">
+                                    Ditolak
+                                </span>
+
                             @endif
+
                         </td>
-                        <td class="py-3 px-4 text-right">
-                            @if($p->status == 'pending')
-                                <div class="inline-flex gap-2 items-center">
-                                    <button onclick="openJadwalModal({{ $p->id }})" class="text-xs font-bold text-amber-600 hover:text-amber-800 bg-amber-50 px-2 py-1 rounded">Atur Seleksi</button>
-                                    
-                                    <form action="{{ route('pembina.pendaftar.terima-langsung', $p->id) }}" method="POST" onsubmit="return confirm('Yakin terima tanpa seleksi?')">
-                                        @csrf @method('PUT')
-                                        <button type="submit" class="text-xs font-bold text-emerald-600 hover:text-emerald-800">Terima Langsung</button>
+
+
+                        {{-- AKSI --}}
+                        <td class="px-4 py-3">
+
+                            <div class="flex items-center justify-center gap-1.5">
+
+                                @if($p->status == 'pending')
+
+                                    {{-- ATUR SELEKSI --}}
+                                    <button
+                                        type="button"
+                                        onclick="openJadwalModal({{ $p->id }})"
+                                        class="px-2.5 py-1.5 text-[10px] font-semibold bg-slate-900 text-white rounded-sm hover:bg-slate-700 transition whitespace-nowrap">
+
+                                        Atur Seleksi
+
+                                    </button>
+
+
+                                    {{-- TERIMA LANGSUNG --}}
+                                    <form
+                                        action="{{ route('pembina.pendaftar.terima-langsung', $p->id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menerima pendaftar ini tanpa seleksi?')">
+
+                                        @csrf
+                                        @method('PUT')
+
+                                        <button
+                                            type="submit"
+                                            class="px-2.5 py-1.5 text-[10px] font-semibold bg-white border border-gray-300 text-gray-700 rounded-sm hover:bg-gray-100 transition whitespace-nowrap">
+
+                                            Setujui
+
+                                        </button>
+
                                     </form>
-                                    
-                                    <button onclick="openTolakModal({{ $p->id }})" class="text-xs font-bold text-rose-600 hover:text-rose-800">Tolak</button>
-                                </div>
-                            @else
-                                <span class="text-xs text-slate-400 italic">Selesai</span>
-                            @endif
+
+
+                                    {{-- TOLAK --}}
+                                    <button
+                                        type="button"
+                                        onclick="openTolakModal({{ $p->id }})"
+                                        class="px-2.5 py-1.5 text-[10px] font-semibold bg-gray-100 text-gray-600 rounded-sm hover:bg-red-50 hover:text-red-600 transition">
+
+                                        Tolak
+
+                                    </button>
+
+                                @else
+
+                                    <span class="text-[10px] text-gray-400">
+                                        Selesai
+                                    </span>
+
+                                @endif
+
+                            </div>
+
                         </td>
+
                     </tr>
+
                     @empty
+
                     <tr>
-                        <td colspan="6" class="py-8 text-center text-slate-500">Belum ada siswa yang mendaftar.</td>
+
+                        <td colspan="6" class="px-4 py-12 text-center">
+
+                            <p class="text-sm font-medium text-gray-600">
+                                Belum ada pendaftar
+                            </p>
+
+                            <p class="text-xs text-gray-400 mt-1">
+                                Data pendaftaran akan muncul di halaman ini.
+                            </p>
+
+                        </td>
+
                     </tr>
+
                     @endforelse
+
                 </tbody>
+
             </table>
+
         </div>
+
+
+        {{-- PAGINATION --}}
+        @if($pendaftarans->hasPages())
+
+            <div class="px-4 py-3 border-t border-gray-200 flex justify-end overflow-x-auto">
+
+                {{ $pendaftarans->links() }}
+
+            </div>
+
+        @endif
+
     </div>
-    
-    <div>{{ $pendaftarans->links() }}</div>
+
 </div>
 
-{{-- ========================================== --}}
-{{-- MODAL TOLAK --}}
-{{-- ========================================== --}}
-<div id="modalTolak" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-        <h2 class="text-lg font-bold text-slate-800 mb-4">Alasan Penolakan</h2>
+
+
+{{-- ===================================== --}}
+{{-- MODAL TOLAK PENDAFTAR --}}
+{{-- ===================================== --}}
+
+<div id="modalTolak"
+     class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/40 p-4">
+
+    <div class="w-full max-w-md bg-white rounded-md shadow-xl max-h-[90vh] overflow-y-auto">
+
+        {{-- HEADER MODAL --}}
+        <div class="px-5 py-4 border-b border-gray-200">
+
+            <h2 class="text-base font-semibold text-slate-900">
+                Alasan Penolakan
+            </h2>
+
+            <p class="text-xs text-gray-500 mt-1">
+                Masukkan alasan penolakan pendaftaran siswa.
+            </p>
+
+        </div>
+
+
+        {{-- FORM --}}
         <form id="formTolak" method="POST">
-            @csrf @method('PUT')
+
+            @csrf
+            @method('PUT')
+
             <input type="hidden" name="status" value="ditolak">
-            <textarea name="alasan_penolakan" required rows="3" class="w-full rounded-xl border border-gray-300 p-3 text-sm focus:ring-rose-500 focus:border-rose-500" placeholder="Tulis alasan penolakan..."></textarea>
-            <div class="mt-4 flex justify-end gap-2">
-                <button type="button" onclick="closeTolakModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Batal</button>
-                <button type="submit" class="px-4 py-2 text-sm font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl">Tolak Pendaftaran</button>
+
+            <div class="p-5">
+
+                <label class="block text-xs font-medium text-gray-700 mb-2">
+                    Alasan Penolakan
+                </label>
+
+                <textarea
+                    name="alasan_penolakan"
+                    required
+                    rows="4"
+                    placeholder="Tuliskan alasan penolakan..."
+                    class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200 resize-none"></textarea>
+
             </div>
+
+
+            {{-- FOOTER --}}
+            <div class="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+
+                <button
+                    type="button"
+                    onclick="closeTolakModal()"
+                    class="px-4 py-2 text-xs font-medium text-gray-600 border border-gray-300 rounded-sm hover:bg-gray-50">
+
+                    Batal
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-slate-900 rounded-sm hover:bg-slate-700">
+
+                    Tolak Pendaftaran
+
+                </button>
+
+            </div>
+
         </form>
+
     </div>
+
 </div>
 
-{{-- ========================================== --}}
+
+
+{{-- ===================================== --}}
 {{-- MODAL ATUR JADWAL SELEKSI --}}
-{{-- ========================================== --}}
-<div id="modalJadwal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-        <h2 class="text-lg font-bold text-slate-800 mb-4">Atur Jadwal Seleksi</h2>
+{{-- ===================================== --}}
+
+<div id="modalJadwal"
+     class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/40 p-4">
+
+    <div class="w-full max-w-md bg-white rounded-md shadow-xl max-h-[90vh] overflow-y-auto">
+
+        {{-- HEADER --}}
+        <div class="px-5 py-4 border-b border-gray-200">
+
+            <h2 class="text-base font-semibold text-slate-900">
+                Atur Jadwal Seleksi
+            </h2>
+
+            <p class="text-xs text-gray-500 mt-1">
+                Tentukan jadwal seleksi untuk calon anggota.
+            </p>
+
+        </div>
+
+
+        {{-- FORM --}}
         <form id="formJadwal" method="POST">
+
             @csrf
-            <div class="space-y-3">
+
+            <div class="p-5 space-y-4">
+
+
+                {{-- TAHAP SELEKSI --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Tahap Seleksi</label>
-                    <input type="text" name="tahap_seleksi" placeholder="Misal: Tes Tulis, Wawancara" required class="w-full rounded-xl border-gray-300 p-2.5 text-sm">
+
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        Tahap Seleksi
+                    </label>
+
+                    <input
+                        type="text"
+                        name="tahap_seleksi"
+                        placeholder="Contoh: Tes Tulis, Wawancara"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200">
+
                 </div>
+
+
+                {{-- TANGGAL --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Tanggal</label>
-                    <input type="date" name="tanggal" required class="w-full rounded-xl border-gray-300 p-2.5 text-sm">
+
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        Tanggal Seleksi
+                    </label>
+
+                    <input
+                        type="date"
+                        name="tanggal"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200">
+
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+
+
+                {{-- JAM --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Jam Mulai</label>
-                        <input type="time" name="jam_mulai" required class="w-full rounded-xl border-gray-300 p-2.5 text-sm">
+
+                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                            Jam Mulai
+                        </label>
+
+                        <input
+                            type="time"
+                            name="jam_mulai"
+                            required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200">
+
                     </div>
+
+
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Jam Selesai</label>
-                        <input type="time" name="jam_selesai" required class="w-full rounded-xl border-gray-300 p-2.5 text-sm">
+
+                        <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                            Jam Selesai
+                        </label>
+
+                        <input
+                            type="time"
+                            name="jam_selesai"
+                            required
+                            class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200">
+
                     </div>
+
                 </div>
+
+
+                {{-- TEMPAT --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Tempat</label>
-                    <input type="text" name="tempat" placeholder="Misal: Lapangan Basket" required class="w-full rounded-xl border-gray-300 p-2.5 text-sm">
+
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        Tempat
+                    </label>
+
+                    <input
+                        type="text"
+                        name="tempat"
+                        placeholder="Contoh: Lapangan Basket"
+                        required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200">
+
                 </div>
+
+
+                {{-- KETERANGAN --}}
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Keterangan (Opsional)</label>
-                    <textarea name="keterangan" rows="2" class="w-full rounded-xl border-gray-300 p-2.5 text-sm"></textarea>
+
+                    <label class="block text-xs font-medium text-gray-700 mb-1.5">
+                        Keterangan (Opsional)
+                    </label>
+
+                    <textarea
+                        name="keterangan"
+                        rows="3"
+                        placeholder="Tambahkan keterangan jika diperlukan..."
+                        class="w-full border border-gray-300 rounded-md px-3 py-2.5 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-200 resize-none"></textarea>
+
                 </div>
+
             </div>
-            <div class="mt-6 flex justify-end gap-2">
-                <button type="button" onclick="closeJadwalModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl">Batal</button>
-                <button type="submit" class="px-4 py-2 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl">Simpan Jadwal</button>
+
+
+            {{-- FOOTER --}}
+            <div class="px-5 py-4 border-t border-gray-200 flex justify-end gap-2">
+
+                <button
+                    type="button"
+                    onclick="closeJadwalModal()"
+                    class="px-4 py-2 text-xs font-medium text-gray-600 border border-gray-300 rounded-sm hover:bg-gray-50">
+
+                    Batal
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-slate-900 rounded-sm hover:bg-slate-700">
+
+                    Simpan Jadwal
+
+                </button>
+
             </div>
+
         </form>
+
     </div>
+
 </div>
+
+
+
+{{-- ===================================== --}}
+{{-- JAVASCRIPT MODAL --}}
+{{-- ===================================== --}}
 
 <script>
-    // Modal Tolak
+
+    // MODAL TOLAK
     const modalTolak = document.getElementById('modalTolak');
     const formTolak = document.getElementById('formTolak');
-    
+
     function openTolakModal(id) {
+
         modalTolak.classList.remove('hidden');
         modalTolak.classList.add('flex');
+
         formTolak.action = `/pembina/pendaftar/${id}/status`;
-    }
-    function closeTolakModal() {
-        modalTolak.classList.add('hidden');
-        modalTolak.classList.remove('flex');
+
+        document.body.classList.add('overflow-hidden');
     }
 
-    // Modal Jadwal
+    function closeTolakModal() {
+
+        modalTolak.classList.add('hidden');
+        modalTolak.classList.remove('flex');
+
+        document.body.classList.remove('overflow-hidden');
+    }
+
+
+    // MODAL JADWAL
     const modalJadwal = document.getElementById('modalJadwal');
     const formJadwal = document.getElementById('formJadwal');
 
     function openJadwalModal(id) {
+
         modalJadwal.classList.remove('hidden');
         modalJadwal.classList.add('flex');
+
         formJadwal.action = `/pembina/pendaftar/${id}/jadwal`;
+
+        document.body.classList.add('overflow-hidden');
     }
+
     function closeJadwalModal() {
+
         modalJadwal.classList.add('hidden');
         modalJadwal.classList.remove('flex');
+
+        document.body.classList.remove('overflow-hidden');
     }
+
+
+    // KLIK AREA LUAR MODAL
+    modalTolak.addEventListener('click', function(e) {
+
+        if (e.target === modalTolak) {
+            closeTolakModal();
+        }
+
+    });
+
+    modalJadwal.addEventListener('click', function(e) {
+
+        if (e.target === modalJadwal) {
+            closeJadwalModal();
+        }
+
+    });
+
+
+    // TOMBOL ESCAPE
+    document.addEventListener('keydown', function(e) {
+
+        if (e.key === 'Escape') {
+            closeTolakModal();
+            closeJadwalModal();
+        }
+
+    });
+
 </script>
+
 @endsection

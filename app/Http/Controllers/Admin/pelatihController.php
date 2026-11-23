@@ -12,14 +12,14 @@ use Illuminate\Support\Facades\DB;
 class pelatihController extends Controller
 {
     // 1. TAMPILKAN DATA PELATIH
-    public function index()
-    {
-        // Variabelnya pakai $pelatih
-        $pelatih = Pembina::with('pengguna')->latest()->paginate(10);
-        
-        // Panggil view admin.pelatih, kirim variabel $pelatih
-        return view('admin.pelatih', compact('pelatih'));
-    }
+   public function index()
+{
+    $pelatih = Pembina::with(['pengguna', 'ekstrakurikuler'])
+        ->latest()
+        ->paginate(10);
+
+    return view('admin.pelatih', compact('pelatih'));
+}
 
     // 2. SIMPAN DATA PELATIH BARU
     public function store(Request $request)

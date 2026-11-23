@@ -26,13 +26,9 @@ class Pembina extends Model
         return $this->belongsTo(Pengguna::class, 'user_id');
     }
 
-    // Relasi ke tabel Ekstrakurikuler (1 Pembina bisa membina banyak ekskul)
+    // Relasi ke ekstrakurikuler
     public function ekstrakurikuler()
     {
         return $this->hasMany(Ekstrakurikuler::class, 'pembina_id');
     }
-    public function pembina()
-{
-    return $this->hasOne(Pembina::class, 'user_id');
-}
 }
