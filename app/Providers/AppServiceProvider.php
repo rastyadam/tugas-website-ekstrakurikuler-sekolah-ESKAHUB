@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Pengumuman;
 use App\Models\JadwalLatihan;
 use App\Models\Pendaftaran;
+use App\Models\Ekstrakurikuler; // ✅ Ditambahkan biar rapi
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Share notifikasi ke layout 'student.layouts.app'
+        // ==========================================
+        // 1. NOTIFIKASI UNTUK LAYOUT SISWA
+        // ==========================================
         View::composer('student.layouts.app', function ($view) {
             if (Auth::check() && Auth::user()->peran === 'siswa') {
                 $siswa = Auth::user()->memberSiswa;
@@ -26,24 +29,48 @@ class AppServiceProvider extends ServiceProvider
                 if ($siswa) {
                     $ekskulIds = Pendaftaran::where('member_id', $siswa->id)->pluck('ekstrakurikuler_id');
 
-                    // 1. Ambil Pengumuman
+                    // Ambil Pengumuman
                     $pengumumans = Pengumuman::with('ekstrakurikuler')
                         ->whereIn('ekstrakurikuler_id', $ekskulIds)
                         ->latest()
                         ->take(5)
                         ->get();
 
-                    // 2. Ambil Jadwal Latihan
+                    // Ambil Jadwal Latihan
                     $jadwals = JadwalLatihan::with('ekstrakurikuler')
                         ->whereIn('ekstrakurikuler_id', $ekskulIds)
                         ->latest()
                         ->take(5)
                         ->get();
 
-                    // 3. Gabungkan dan Urutkan berdasarkan created_at terbaru
+                    // Gabungkan dan Urutkan berdasarkan created_at terbaru
                     $notifikasis = $pengumumans->concat($jadwals)->sortByDesc('created_at')->take(5);
 
                     $view->with('notifikasis', $notifikasis);
+                }
+            }
+        });
+
+
+        // ==========================================
+        // 2. NOTIFIKASI UNTUK LAYOUT PEMBINA
+        // ==========================================
+        View::composer('pembina.layouts.app', function ($view) {
+            if (Auth::check() && Auth::user()->peran === 'pembina') {
+                $pembina = Auth::user()->pembina;
+                
+                if ($pembina) {
+                    $ekskulIds = Ekstrakurikuler::where('pembina_id', $pembina->id)->pluck('id');
+                    
+                    // Ambil 5 pendaftar baru (status pending) di ekskul yang diampu
+                    $notifikasiPembinas = Pendaftaran::with(['member', 'ekstrakurikuler'])
+                        ->whereIn('ekstrakurikuler_id', $ekskulIds)
+                        ->where('status', 'pending')
+                        ->latest()
+                        ->take(5)
+                        ->get();
+
+                    $view->with('notifikasiPembinas', $notifikasiPembinas);
                 }
             }
         });

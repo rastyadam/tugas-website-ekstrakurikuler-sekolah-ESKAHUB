@@ -6,22 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Models\Ekstrakurikuler;
 use App\Models\Pendaftaran;
 use App\Models\MemberSiswa;
+use App\Exports\LaporanExport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\LaporanExport;
-use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
+    /**
+     * Menampilkan Halaman Laporan
+     */
     public function index()
     {
         // 1. Statistik Atas
         $totalSiswa = MemberSiswa::count();
         $programAktif = Ekstrakurikuler::where('status', 'aktif')->count();
-        $pendaftaranBaru = Pendaftaran::whereMonth('created_at', now()->month)->count(); 
+        $pendaftaranBaru = Pendaftaran::whereMonth('created_at', now()->month)->count();
         
-        // 2. Data Tabel (Ekskul beserta jumlah pendaftar dan kehadiran)
-        // Kita pakai withCount buat ngitung jumlah pendaftar (yang statusnya diterima)
+        // 2. Data Tabel (Ekskul beserta jumlah pendaftar)
         $ekskuls = Ekstrakurikuler::with('pembina')
             ->withCount(['pendaftarans as total_peserta' => function ($query) {
                 $query->where('status', 'diterima');
@@ -29,11 +30,10 @@ class LaporanController extends Controller
             ->latest()
             ->paginate(10);
 
-        // 3. Hitung Rata-rata Kehadiran (Simulasi, karena tabel absensi belum ada)
-        // Karena belum ada tabel absensi, kita pakai angka random atau rumus dummy buat presentasi
+        // 3. Hitung Rata-rata Kehadiran (Simulasi)
         $totalKehadiran = 0;
         foreach ($ekskuls as $ekskul) {
-            // Anggap saja kehadiran 80-98% (simulasi)
+            // Karena tabel absensi belum ada, kita pakai simulasi angka 80-98%
             $ekskul->persentase_kehadiran = rand(80, 98); 
             $totalKehadiran += $ekskul->persentase_kehadiran;
         }
@@ -47,9 +47,12 @@ class LaporanController extends Controller
             'rataKehadiran',
             'ekskuls'
         ));
-
     }
-       public function export()
+
+    /**
+     * Export Laporan ke Excel
+     */
+    public function export()
     {
         return Excel::download(new LaporanExport, 'laporan_ekstrakurikuler_' . date('Ymd') . '.xlsx');
     }

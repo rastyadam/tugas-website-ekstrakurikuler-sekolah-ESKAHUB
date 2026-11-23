@@ -10,29 +10,80 @@ use App\Models\Pengumuman;
 use App\Models\JadwalLatihan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash; 
 
 class DashboardController extends Controller
 {
     // 1. Halaman Dashboard Pembina
-    public function index()
-    {
-        $user = Auth::user();
-        $pembina = $user->pembina;
+   public function index(Request $request)
+{
+    $user = Auth::user();
+    $pembina = $user->pembina;
 
-        if (!$pembina) {
-            return redirect('/')->withErrors(['msg' => 'Profil pembina tidak ditemukan.']);
+    if (!$pembina) {
+        return redirect('/')->withErrors(['msg' => 'Profil pembina tidak ditemukan.']);
+    }
+
+    $ekskuls = Ekstrakurikuler::where('pembina_id', $pembina->id)->get();
+    $ekskulIds = $ekskuls->pluck('id');
+
+    $totalPendaftar = Pendaftaran::whereIn('ekstrakurikuler_id', $ekskulIds)->count();
+    $pendingPendaftar = Pendaftaran::whereIn('ekstrakurikuler_id', $ekskulIds)
+        ->where('status', 'pending')
+        ->count();
+
+    // ===== TREN PENDAFTARAN PER MINGGU =====
+    $periode = $request->get('periode', 'bulan_ini');
+    $bulan = $periode === 'bulan_lalu'
+        ? \Carbon\Carbon::now()->subMonth()
+        : \Carbon\Carbon::now();
+
+    $startOfMonth = $bulan->copy()->startOfMonth();
+    $endOfMonth   = $bulan->copy()->endOfMonth();
+
+    $jumlahMinggu = ceil($endOfMonth->day / 7);
+    $labelsMinggu = [];
+    $dataMinggu   = [];
+
+    for ($i = 1; $i <= $jumlahMinggu; $i++) {
+        $start = $startOfMonth->copy()->addDays(($i - 1) * 7);
+        $end   = $start->copy()->addDays(6);
+        if ($end->gt($endOfMonth)) {
+            $end = $endOfMonth->copy();
         }
 
-        $ekskuls = Ekstrakurikuler::where('pembina_id', $pembina->id)->get();
-        $ekskulIds = $ekskuls->pluck('id');
-
-        $totalPendaftar = Pendaftaran::whereIn('ekstrakurikuler_id', $ekskulIds)->count();
-        $pendingPendaftar = Pendaftaran::whereIn('ekstrakurikuler_id', $ekskulIds)
-            ->where('status', 'pending')
+        $labelsMinggu[] = 'Minggu ' . $i;
+        $dataMinggu[] = Pendaftaran::whereIn('ekstrakurikuler_id', $ekskulIds)
+            ->whereBetween('tanggal_daftar', [$start->startOfDay(), $end->endOfDay()])
             ->count();
-
-        return view('pembina.dashboard-pembina', compact('ekskuls', 'totalPendaftar', 'pendingPendaftar'));
     }
+
+    // ===== AKTIVITAS TERKINI =====
+    $aktivitasTerkini = Pendaftaran::with(['member', 'ekstrakurikuler'])
+        ->whereIn('ekstrakurikuler_id', $ekskulIds)
+        ->orderByDesc('tanggal_daftar')
+        ->orderByDesc('created_at')
+        ->limit(5)
+        ->get()
+        ->map(function ($p) {
+            return [
+                'judul'  => 'Pendaftar baru: ' . ($p->member->nama ?? $p->nisn ?? '-')
+                          . ' — ' . ($p->ekstrakurikuler->nama ?? '-'),
+                'waktu'  => $p->tanggal_daftar ?? $p->created_at,
+                'status' => $p->status,
+            ];
+        });
+
+    return view('pembina.dashboard-pembina', compact(
+        'ekskuls',
+        'totalPendaftar',
+        'pendingPendaftar',
+        'labelsMinggu',
+        'dataMinggu',
+        'aktivitasTerkini',
+        'periode',
+    ));
+}
 
     // 2. Halaman Daftar Pendaftar
     public function pendaftar(Request $request)
@@ -283,6 +334,62 @@ public function exportAnggota()
         return view('pembina.pengumuman', compact('ekskuls', 'pengumumans'));
     }
 
+    public function profil()
+    {
+        $user = Auth::user();
+        // Ambil ekskul yang diampu pembina ini (buat list di sidebar)
+        $ekskuls = Ekstrakurikuler::where('pembina_id', $user->pembina->id ?? 0)->get();
+        
+        return view('pembina.profil', compact('user', 'ekskuls'));
+    }
+
+    // 12. Update Profil (Nama, Email, No HP)
+    public function updateProfil(Request $request)
+    {
+        $user = Auth::user();
+        $pembina = $user->pembina;
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:pengguna,email,' . $user->id,
+            'no_hp' => 'nullable|string|max:20',
+        ]);
+
+        $user->update([
+            'nama' => $request->nama,
+            'email' => $request->email,
+        ]);
+
+        if ($pembina) {
+            $pembina->update([
+                'nama' => $request->nama,
+                'no_hp' => $request->no_hp,
+            ]);
+        }
+
+        return back()->with('success', 'Profil berhasil diperbarui!');
+    }
+
+    // 13. Update Password
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'kata_sandi_lama' => 'required',
+            'kata_sandi' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->kata_sandi_lama, $user->kata_sandi)) {
+            return back()->withErrors(['kata_sandi_lama' => 'Password lama tidak cocok.']);
+        }
+
+        $user->update([
+            'kata_sandi' => Hash::make($request->kata_sandi),
+        ]);
+
+        return back()->with('success', 'Password berhasil diperbarui!');
+    }
 
     
 }
