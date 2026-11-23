@@ -7,26 +7,41 @@ use App\Models\Ekstrakurikuler;
 use App\Models\Pembina;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use App\Exports\EkstrakurikulerExport;
+use Maatwebsite\Excel\Facades\Excel;
 class EkstrakurikulerController extends Controller
 {
     // 1. TAMPILKAN DATA
-    public function index()
+    public function index(Request $request)
 {
-    // Ambil data ekskul beserta relasinya
-    $ekskuls = \App\Models\Ekstrakurikuler::with('pembina')->latest()->paginate(10);
-    
-    // ✅ Hitung jumlah pendaftar (pending + diterima) untuk setiap ekskul
-    foreach ($ekskuls as $ekskul) {
-        $ekskul->terisi = \App\Models\Pendaftaran::where('ekstrakurikuler_id', $ekskul->id)
-            ->whereIn('status', ['pending', 'diterima'])
-            ->count();
+    $query = Ekstrakurikuler::with('pembina'); // Sesuaikan nama Model Ekskul Anda
+
+    // 1. Fitur Search (Nama ekskul, deskripsi, atau nama pembina)
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('nama', 'like', "%{$search}%")
+              ->orWhere('deskripsi', 'like', "%{$search}%")
+              ->orWhereHas('pembina', function ($qPembina) use ($search) {
+                  $qPembina->where('nama', 'like', "%{$search}%");
+              });
+        });
     }
 
-    // Ambil data pembina buat dropdown form
-    $pembinas = \App\Models\Pembina::all();
+    // 2. Fitur Filter Status
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
 
-    return view('admin.adexstra', compact('ekskuls', 'pembinas'));
+    // 3. Fitur Urutan (A-Z / Z-A)
+    $sortOrder = $request->get('sort', 'asc') === 'desc' ? 'desc' : 'asc';
+    $query->orderBy('nama', $sortOrder);
+
+    // 4. Paginasi + simpan parameter query URL
+    $ekskuls = $query->paginate(10)->withQueryString();
+    $pembinas = Pembina::all(); // Sesuaikan dengan query pembina Anda sebelumnya
+
+    return view('admin.adexstra', compact('ekskuls', 'pembinas')); // Sesuaikan nama view Anda
 }
 
     // 2. SIMPAN DATA BARU
@@ -97,5 +112,19 @@ class EkstrakurikulerController extends Controller
     }
 
 
+
+public function export(Request $request)
+{
+    $namaFile = 'data-ekstrakurikuler-' . now()->format('Y-m-d-His') . '.xlsx';
+
+    return Excel::download(
+        new EkstrakurikulerExport(
+            $request->search,
+            $request->status,
+            $request->sort ?? 'asc'
+        ),
+        $namaFile
+    );
+}
     
 }

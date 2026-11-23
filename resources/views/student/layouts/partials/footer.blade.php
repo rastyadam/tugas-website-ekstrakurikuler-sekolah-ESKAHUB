@@ -26,10 +26,10 @@
             <h4 class="mb-4 text-sm font-semibold">Services</h4>
             <ul class="space-y-3 text-sm text-gray-400">
                 <li><a href="{{ route('student.beranda') }}" class="transition hover:text-white">Beranda</a></li>
-                <li><a href="#" class="transition hover:text-white">Ekstrakurikuler</a></li>
-                <li><a href="#" class="transition hover:text-white">Pendaftaran</a></li>
-                <li><a href="#" class="transition hover:text-white">Pengumuman</a></li>
-                <li><a href="#" class="transition hover:text-white">Pengguna</a></li>
+                <li><a href="{{ route('student.ekstra') }}" class="transition hover:text-white">Ekstrakurikuler</a></li>
+                <li><a href="{{ route('student.pendaftaran-saya') }}" class="transition hover:text-white">Pendaftaran</a></li>
+                <li><a href="{{ route('student.pengumuman-saya') }}" class="transition hover:text-white">Pengumuman</a></li>
+                <li><a href="{{ route('student.profil') }}" class="transition hover:text-white">Pengguna</a></li>
             </ul>
         </div>
 
