@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\DB;
 
 class pelatihController extends Controller
 {
+    // 1. TAMPILKAN DATA PELATIH
+   public function index()
+{
+    $pelatih = Pembina::with(['pengguna', 'ekstrakurikuler'])
+        ->latest()
+        ->paginate(10);
+
+    return view('admin.pelatih', compact('pelatih'));
+}
     public function index(Request $request)
     {
         $query = Pembina::with(['pengguna', 'ekstrakurikuler']);
