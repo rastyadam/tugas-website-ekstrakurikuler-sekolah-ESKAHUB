@@ -18,6 +18,11 @@ class Ekstrakurikuler extends Model
         'kuota',
         'status',
         'pembina_id',
+        'logo', 
+        'hari',
+         'tanggal_mulai',
+          'jam_mulai',
+           'jam_selesai'
     ];
 
     // Relasi ke Pembina
