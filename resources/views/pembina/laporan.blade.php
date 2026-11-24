@@ -14,213 +14,168 @@
     }
 </style>
 
-<div class="w-full">
+<div class="w-full text-gray-800">
 
-    {{-- SEARCH BAR --}}
-    <div class="mb-8 no-print">
-        <form action="{{ route('pembina.laporan') }}" method="GET" class="relative max-w-md">
-            {{-- Pertahankan semua filter saat mencari --}}
+    <!-- Search -->
+    <div class="mb-5 no-print">
+        <form action="{{ route('pembina.laporan') }}" method="GET" class="w-full sm:max-w-sm">
             <input type="hidden" name="start_date" value="{{ request('start_date') }}">
             <input type="hidden" name="end_date" value="{{ request('end_date') }}">
             <input type="hidden" name="status" value="{{ request('status') }}">
             <input type="hidden" name="ekstrakurikuler_id" value="{{ request('ekstrakurikuler_id') }}">
 
-            <div class="flex items-center border border-gray-300 bg-white px-3.5 py-2.5 focus-within:border-gray-500 transition">
-                <svg class="w-4 h-4 text-gray-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
-                </svg>
-
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari nama siswa, NISN, atau ekskul..."
-                    class="w-full text-sm text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent"
-                >
-            </div>
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Cari nama siswa atau ekskul..."
+                   class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-amber-600">
         </form>
     </div>
 
-    {{-- HEADER --}}
-    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Laporan</h1>
-            <p class="text-xs text-gray-500 mt-1.5">
-                Hasilkan dan ekspor laporan partisipasi kegiatan ekstrakurikuler.
-            </p>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Laporan</h1>
+            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Rekap data pendaftaran ekstrakurikuler.</p>
         </div>
 
-        <button
-            type="button"
-            onclick="window.print()"
-            class="no-print inline-flex items-center gap-2 bg-[#F5B800] hover:bg-[#e0a800] text-white text-xs font-semibold px-4 py-2.5 rounded shadow-xs transition w-fit"
-        >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            <span>PRINT PDF</span>
+        <button type="button"
+                onclick="window.print()"
+                class="no-print w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-4 py-2 rounded-md transition cursor-pointer">
+            Print PDF
         </button>
     </div>
 
-    {{-- FILTER BOX --}}
-    <div class="border border-gray-200 rounded-md p-5 mb-6 bg-white no-print">
-        <form action="{{ route('pembina.laporan') }}" method="GET"
-              class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-
-            {{-- Pertahankan pencarian --}}
+    <!-- Filter -->
+    <div class="bg-white border border-gray-200 rounded-md p-4 mb-5 no-print">
+        <form action="{{ route('pembina.laporan') }}" method="GET" class="space-y-3.5">
             <input type="hidden" name="search" value="{{ request('search') }}">
 
-            <div class="flex flex-col md:flex-row items-start md:items-end gap-4 flex-1">
-
-                {{-- TANGGAL --}}
-                <div class="w-full md:w-auto">
-                    <label class="block text-xs font-semibold text-gray-800 mb-2">Rentang Tanggal</label>
-                    <div class="flex items-center gap-2.5">
-                        <input type="date" name="start_date" value="{{ request('start_date') }}"
-                            class="w-full sm:w-40 border border-gray-300 rounded px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-500">
-                        <span class="text-xs text-gray-400">sampai</span>
-                        <input type="date" name="end_date" value="{{ request('end_date') }}"
-                            class="w-full sm:w-40 border border-gray-300 rounded px-3 py-2 text-xs text-gray-600 focus:outline-none focus:border-gray-500">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-end">
+                <div class="md:col-span-6">
+                    <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal</label>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <input type="date"
+                               name="start_date"
+                               value="{{ request('start_date') }}"
+                               class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-amber-600">
+                        <span class="text-xs text-gray-400 text-center">s/d</span>
+                        <input type="date"
+                               name="end_date"
+                               value="{{ request('end_date') }}"
+                               class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-amber-600">
                     </div>
                 </div>
 
-                {{-- EKSKUL --}}
-                <div class="w-full md:w-56">
-                    <label for="ekstrakurikuler_id" class="block text-xs font-semibold text-gray-800 mb-2">
-                        Ekstrakurikuler
-                    </label>
-                    <select id="ekstrakurikuler_id" name="ekstrakurikuler_id"
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-xs text-gray-600 bg-white focus:outline-none focus:border-gray-500">
+                <div class="md:col-span-3">
+                    <label for="ekstrakurikuler_id" class="block text-xs font-medium text-gray-700 mb-1">Ekstrakurikuler</label>
+                    <select id="ekstrakurikuler_id"
+                            name="ekstrakurikuler_id"
+                            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-amber-600">
                         <option value="">Semua Ekskul</option>
                         @foreach($daftarEkstrakurikuler as $ekskul)
-                            <option value="{{ $ekskul->id }}"
-                                {{ request('ekstrakurikuler_id') == $ekskul->id ? 'selected' : '' }}>
+                            <option value="{{ $ekskul->id }}" {{ request('ekstrakurikuler_id') == $ekskul->id ? 'selected' : '' }}>
                                 {{ $ekskul->nama }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                {{-- STATUS --}}
-                <div class="w-full md:w-56">
-                    <label for="status" class="block text-xs font-semibold text-gray-800 mb-2">Status</label>
-                    <select id="status" name="status"
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-xs text-gray-600 bg-white focus:outline-none focus:border-gray-500">
+                <div class="md:col-span-3">
+                    <label for="status" class="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                    <select id="status"
+                            name="status"
+                            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-xs text-gray-700 focus:outline-none focus:border-amber-600">
                         <option value="">Semua Status</option>
-                        <option value="pending"  {{ request('status') == 'pending'  ? 'selected' : '' }}>PENDING</option>
-                        <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>DITERIMA</option>
-                        <option value="ditolak"  {{ request('status') == 'ditolak'  ? 'selected' : '' }}>DITOLAK</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="diterima" {{ request('status') == 'diterima' ? 'selected' : '' }}>Diterima</option>
+                        <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                     </select>
                 </div>
-
             </div>
 
-            {{-- BUTTON FILTER --}}
-            <div class="flex gap-2">
-                <button type="submit"
-                    class="w-full lg:w-auto bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-medium px-6 py-2.5 rounded transition cursor-pointer">
-                    Apply Filters
-                </button>
+            <div class="pt-3 border-t border-gray-100 flex flex-col sm:flex-row sm:justify-end gap-2">
                 <a href="{{ route('pembina.laporan') }}"
-                    class="inline-flex items-center justify-center border border-gray-300 hover:bg-gray-50 text-gray-600 text-xs px-4 py-2.5 rounded transition">
+                   class="w-full sm:w-auto text-center border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-medium px-4 py-2 rounded-md">
                     Reset
                 </a>
+                <button type="submit"
+                        class="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white text-xs font-medium px-4 py-2 rounded-md cursor-pointer">
+                    Filter
+                </button>
             </div>
-
         </form>
     </div>
 
-    {{-- SUMMARY CARDS --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-        <div class="border border-gray-200 rounded-md p-6 bg-white">
-            <p class="text-xs font-semibold text-gray-700 uppercase tracking-wide">TOTAL PENDAFTAR</p>
-            <p class="text-2xl font-bold text-gray-600 mt-2">{{ $totalPendaftar ?? 0 }}</p>
-            <p class="text-[11px] text-gray-400 mt-1">Berdasarkan filter yang diterapkan</p>
+    <!-- Ringkasan -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+        <div class="bg-white border border-gray-200 rounded-md p-4">
+            <p class="text-xs font-medium text-gray-500">Total Pendaftar</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ $totalPendaftar ?? 0 }}</p>
         </div>
 
-        <div class="border border-gray-200 rounded-md p-6 bg-white">
-            <p class="text-xs font-semibold text-gray-700 uppercase tracking-wide">TOTAL ANGGOTA AKTIF</p>
-            <p class="text-2xl font-bold text-gray-600 mt-2">{{ $totalAnggotaAktif ?? 0 }}</p>
-            <p class="text-[11px] text-gray-400 mt-1">Pendaftar dengan status diterima</p>
+        <div class="bg-white border border-gray-200 rounded-md p-4">
+            <p class="text-xs font-medium text-gray-500">Total Anggota Aktif</p>
+            <p class="text-2xl font-bold text-amber-700 mt-1">{{ $totalAnggotaAktif ?? 0 }}</p>
         </div>
     </div>
 
-    {{-- TABLE LAPORAN --}}
-    <div class="w-full border border-gray-200 rounded-md overflow-hidden bg-white print-area">
-
-        {{-- TABLE HEADER --}}
-        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-200">
-            <div>
-                <h2 class="text-xs font-bold text-gray-800 uppercase tracking-wider">PENDAFTAR REPORT</h2>
-                <p class="text-[11px] text-gray-400 mt-1">Data pendaftaran ekstrakurikuler</p>
-            </div>
-            <svg class="w-5 h-5 text-gray-700 no-print" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-                      d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-            </svg>
+    <!-- Data Laporan -->
+    <div class="w-full bg-white border border-gray-200 rounded-md overflow-hidden print-area">
+        <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-xs font-bold text-gray-800">Data Pendaftar</h2>
+            <span class="text-xs text-gray-500">{{ $pendaftars->total() }} data</span>
         </div>
 
-        {{-- TABLE --}}
-        <div class="overflow-x-auto">
+        <!-- Mobile -->
+        <div class="divide-y divide-gray-200 md:hidden no-print">
+            @forelse ($pendaftars as $index => $item)
+                <div class="p-4 space-y-1.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <p class="text-sm font-semibold text-gray-900">
+                            {{ $pendaftars->firstItem() + $index }}. {{ $item->member?->nama ?? 'Nama tidak tersedia' }}
+                        </p>
+                        <span class="text-xs font-medium {{ $item->status === 'diterima' ? 'text-green-700' : ($item->status === 'ditolak' ? 'text-red-700' : 'text-amber-700') }}">
+                            {{ ucfirst($item->status ?? 'pending') }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-600">{{ $item->ekstrakurikuler?->nama ?? '-' }}</p>
+                    <p class="text-xs text-gray-400">{{ $item->created_at ? $item->created_at->format('d M Y') : '-' }}</p>
+                </div>
+            @empty
+                <div class="p-8 text-center text-xs sm:text-sm text-gray-500">
+                    Belum ada data pendaftaran.
+                </div>
+            @endforelse
+        </div>
+
+        <!-- Desktop -->
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-[#88929B] text-white text-[11px] font-semibold uppercase tracking-wider">
-                        <th class="py-3 px-5">NO</th>
-                        <th class="py-3 px-5">NAME</th>
-                        <th class="py-3 px-5">EKSTRAKURIKULER</th>
-                        <th class="py-3 px-5">DATE</th>
-                        <th class="py-3 px-5">STATUS</th>
+                    <tr class="bg-gray-100 text-gray-700 text-xs font-semibold border-b border-gray-200">
+                        <th class="py-2.5 px-4 w-14">No</th>
+                        <th class="py-2.5 px-4">Nama</th>
+                        <th class="py-2.5 px-4">Ekstrakurikuler</th>
+                        <th class="py-2.5 px-4">Tanggal</th>
+                        <th class="py-2.5 px-4">Status</th>
                     </tr>
                 </thead>
-
-                <tbody class="divide-y divide-gray-200 text-xs text-gray-700">
+                <tbody class="divide-y divide-gray-200 text-xs sm:text-sm text-gray-700">
                     @forelse ($pendaftars as $index => $item)
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="py-3.5 px-5 text-gray-500">
-                                {{ $pendaftars->firstItem() + $index }}
-                            </td>
-
-                            <td class="py-3.5 px-5 font-medium text-gray-800">
-                                {{ $item->member?->nama ?? 'Nama tidak tersedia' }}
-                            </td>
-
-                            <td class="py-3.5 px-5 text-gray-600">
-                                {{ $item->ekstrakurikuler?->nama ?? '-' }}
-                            </td>
-
-                            <td class="py-3.5 px-5 text-gray-600">
-                                {{ $item->created_at ? $item->created_at->format('d M Y') : '-' }}
-                            </td>
-
-                            <td class="py-3.5 px-5 font-semibold">
-                                @if ($item->status === 'diterima')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-green-50 text-green-600">
-                                        DITERIMA
-                                    </span>
-                                @elseif ($item->status === 'ditolak')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-red-50 text-red-600">
-                                        DITOLAK
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-600">
-                                        PENDING
-                                    </span>
-                                @endif
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 text-gray-500">{{ $pendaftars->firstItem() + $index }}</td>
+                            <td class="py-3 px-4 font-medium text-gray-900">{{ $item->member?->nama ?? 'Nama tidak tersedia' }}</td>
+                            <td class="py-3 px-4 text-gray-600">{{ $item->ekstrakurikuler?->nama ?? '-' }}</td>
+                            <td class="py-3 px-4 text-gray-600 whitespace-nowrap">{{ $item->created_at ? $item->created_at->format('d M Y') : '-' }}</td>
+                            <td class="py-3 px-4 whitespace-nowrap font-medium {{ $item->status === 'diterima' ? 'text-green-700' : ($item->status === 'ditolak' ? 'text-red-700' : 'text-amber-700') }}">
+                                {{ ucfirst($item->status ?? 'pending') }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-12 px-5 text-center">
-                                <div class="flex flex-col items-center">
-                                    <svg class="w-10 h-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    <p class="text-sm font-medium text-gray-500">Belum ada data pendaftaran</p>
-                                    <p class="text-xs text-gray-400 mt-1">Data tidak ditemukan atau belum tersedia.</p>
-                                </div>
+                            <td colspan="5" class="py-8 px-4 text-center text-sm text-gray-500">
+                                Belum ada data pendaftaran.
                             </td>
                         </tr>
                     @endforelse
@@ -228,15 +183,12 @@
             </table>
         </div>
 
-        {{-- PAGINATION --}}
         @if ($pendaftars->hasPages())
-            <div class="px-5 py-4 border-t border-gray-200 no-print">
-                {{ $pendaftars->links() }}
+            <div class="px-4 py-3 border-t border-gray-200 no-print">
+                {{ $pendaftars->withQueryString()->links() }}
             </div>
         @endif
-
     </div>
 
 </div>
-
 @endsection
