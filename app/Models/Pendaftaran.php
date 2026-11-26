@@ -40,7 +40,11 @@ class Pendaftaran extends Model
     }
     public function detailPersyaratan()
 {
-    return $this->hasOne(DetailPersyaratanSiswa::class, 'peserta_id', 'peserta_id');
+    return $this->hasMany(
+        DetailPersyaratanSiswa::class,
+        'peserta_id',
+        'peserta_id'
+    );
 }
 public function jadwalSeleksi()
 {

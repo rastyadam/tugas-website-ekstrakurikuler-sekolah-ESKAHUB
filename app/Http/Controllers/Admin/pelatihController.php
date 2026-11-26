@@ -5,22 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pembina;
 use App\Models\Pengguna;
-use App\Models\Ekstrakurikuler; // Sesuaikan dengan nama Model Ekstrakurikuler Anda
+use App\Models\Ekstrakurikuler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 
 class pelatihController extends Controller
 {
-    // 1. TAMPILKAN DATA PELATIH
-   public function index()
-{
-    $pelatih = Pembina::with(['pengguna', 'ekstrakurikuler'])
-        ->latest()
-        ->paginate(10);
-
-    return view('admin.pelatih', compact('pelatih'));
-}
+    // 1. TAMPILKAN DATA PELATIH (Hanya ada SATU fungsi index)
     public function index(Request $request)
     {
         $query = Pembina::with(['pengguna', 'ekstrakurikuler']);
@@ -40,7 +32,7 @@ class pelatihController extends Controller
             });
         }
 
-        // 2. Filter Tab / Status (Opsional jika kolom status sudah ada)
+        // 2. Filter Tab / Status
         if ($request->get('tab') === 'aktif') {
             $query->has('ekstrakurikuler');
         } elseif ($request->get('tab') === 'nonaktif') {
@@ -78,7 +70,7 @@ class pelatihController extends Controller
         ));
     }
 
-    // Method store(), update(), destroy() tetap sama seperti kode Anda
+    // 2. SIMPAN DATA BARU
     public function store(Request $request)
     {
         $request->validate([
@@ -111,6 +103,7 @@ class pelatihController extends Controller
         return redirect()->route('admin.pelatih')->with('success', 'Data Pelatih & Akun berhasil ditambahkan!');
     }
 
+    // 3. UPDATE DATA
     public function update(Request $request, $id)
     {
         $pembina = Pembina::findOrFail($id);
@@ -147,6 +140,7 @@ class pelatihController extends Controller
         return redirect()->route('admin.pelatih')->with('success', 'Data Pembina berhasil diperbarui!');
     }
 
+    // 4. HAPUS DATA
     public function destroy($id)
     {
         $pelatih = Pembina::findOrFail($id);

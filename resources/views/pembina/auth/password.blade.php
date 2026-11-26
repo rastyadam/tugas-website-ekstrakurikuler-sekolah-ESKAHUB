@@ -1,65 +1,142 @@
-@extends('pembina.layouts.app') {{-- Sesuaikan dengan layout yang dipakai --}}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ganti Password - EskaHub</title>
 
-@section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-10">
-    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
-        <h2 class="text-2xl font-bold text-slate-800 mb-2">Wajib Ganti Password</h2>
-        <p class="text-sm text-gray-500 mb-6">Demi keamanan akun, silakan buat password baru Anda.</p>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
 
-        <form action="{{ route('password.update') }}" method="POST">
-            @csrf
-            
-            {{-- Input Password Baru --}}
-            <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700 mb-1">Password Baru</label>
-                <div class="relative">
-                    <input type="password" id="password" name="password" required minlength="8" 
-                        class="w-full rounded-xl border border-gray-300 px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none">
-                    
-                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
-                </div>
-                @error('password') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-            </div>
+    <div class="flex min-h-screen flex-col items-center justify-center px-4 py-10">
 
-            {{-- Input Konfirmasi Password --}}
+        {{-- Identitas Singkat di Atas Card --}}
+        <div class="mb-6 text-center">
+            <span class="inline-flex items-center gap-2 rounded-full bg-amber-100/80 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-800">
+                <i class="fa-solid fa-shield-halved"></i> Keamanan Akun EskaHub
+            </span>
+        </div>
+
+        {{-- Card Form Ganti Password --}}
+        <div class="w-full max-w-md rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
             <div class="mb-6">
-                <label class="block text-sm font-bold text-gray-700 mb-1">Konfirmasi Password Baru</label>
-                <div class="relative">
-                    <input type="password" id="password_confirmation" name="password_confirmation" required minlength="8" 
-                        class="w-full rounded-xl border border-gray-300 px-4 py-3 pr-10 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all outline-none">
-                    
-                    <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
-                        <i class="fa-regular fa-eye"></i>
-                    </button>
-                </div>
+                <h1 class="text-2xl font-bold text-slate-900">Ganti Password</h1>
+                <p class="mt-1.5 text-sm text-slate-500">
+                    Demi keamanan akun, silakan perbarui password Anda sebelum melanjutkan ke dashboard.
+                </p>
             </div>
 
-            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-sm transition">
-                Simpan Password Baru
-            </button>
-        </form>
+            <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
+                @csrf
+
+                {{-- Input Password Lama --}}
+                <div>
+                    <label for="kata_sandi_lama" class="mb-1.5 block text-xs font-bold text-slate-800">
+                        Password Lama
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="kata_sandi_lama"
+                            name="kata_sandi_lama"
+                            required
+                            placeholder="Masukkan password saat ini"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-11 text-sm text-slate-800 outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                        >
+                        <button
+                            type="button"
+                            class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 transition hover:text-slate-600 focus:outline-none"
+                        >
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    @error('kata_sandi_lama')
+                        <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Input Password Baru --}}
+                <div>
+                    <label for="kata_sandi" class="mb-1.5 block text-xs font-bold text-slate-800">
+                        Password Baru
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="kata_sandi"
+                            name="kata_sandi"
+                            required
+                            minlength="8"
+                            placeholder="Minimal 8 karakter"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-11 text-sm text-slate-800 outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                        >
+                        <button
+                            type="button"
+                            class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 transition hover:text-slate-600 focus:outline-none"
+                        >
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                    @error('kata_sandi')
+                        <span class="mt-1.5 block text-xs font-medium text-red-500">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                {{-- Input Konfirmasi Password Baru --}}
+                <div class="pb-2">
+                    <label for="kata_sandi_confirmation" class="mb-1.5 block text-xs font-bold text-slate-800">
+                        Konfirmasi Password Baru
+                    </label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="kata_sandi_confirmation"
+                            name="kata_sandi_confirmation"
+                            required
+                            minlength="8"
+                            placeholder="Ulangi password baru"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 pr-11 text-sm text-slate-800 outline-none transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                        >
+                        <button
+                            type="button"
+                            class="toggle-password absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 transition hover:text-slate-600 focus:outline-none"
+                        >
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full rounded-xl bg-amber-500 py-3.5 text-sm font-bold text-white shadow-xs transition hover:bg-amber-600 active:scale-[0.99]"
+                >
+                    Simpan Password Baru
+                </button>
+            </form>
+        </div>
+
     </div>
-</div>
 
-{{-- SCRIPT TOGGLE PASSWORD --}}
-<script>
-    document.querySelectorAll('.toggle-password').forEach(function(button) {
-        button.addEventListener('click', function() {
-            const input = this.parentElement.querySelector('input');
-            const icon = this.querySelector('i');
+    {{-- Script Toggle Password --}}
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
 
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
         });
-    });
-</script>
-@endsection
+    </script>
+</body>
+</html>

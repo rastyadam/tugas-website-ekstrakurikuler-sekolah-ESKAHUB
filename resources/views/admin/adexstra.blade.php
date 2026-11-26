@@ -12,6 +12,17 @@
 @endsection
 
 @section('content')
+  @if ($errors->any())
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        <p class="font-bold mb-2">Terjadi kesalahan:</p>
+
+        <ul class="list-disc pl-5">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <div class="mt-4 space-y-6 relative">
 
     {{-- ALERT SUCCESS --}}
@@ -142,7 +153,12 @@
                     {{-- Aksi --}}
                     <td class="py-4 px-4 text-right">
                         <div class="inline-flex items-center gap-3 font-medium text-xs">
-                            <button onclick="editModal({{ $ekskul }})" class="text-blue-600 hover:text-blue-800">Ubah</button>
+                            <button
+                                type="button"
+                                onclick="editModal(@js($ekskul))"
+                                class="text-blue-600 hover:text-blue-800">
+                                Ubah
+                            </button>
                             <form action="{{ route('admin.adexstra.destroy', $ekskul->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus ekstrakurikuler ini?')">
                                 @csrf
                                 @method('DELETE')
@@ -192,10 +208,11 @@
             @csrf
             <div id="methodField"></div>
 
-            <div class="space-y-4">
+            {{-- MODAL SCROLLING BODY --}}
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Nama Ekstrakurikuler <span class="text-rose-500">*</span></label>
-                    <input type="text" name="nama" id="inputNama" required class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    <input type="text" name="nama" id="inputNama" required class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all uppercase" placeholder="CONTOH: BASKET">
                 </div>
                 
                 <div>
@@ -203,6 +220,40 @@
                     <textarea name="deskripsi" id="inputDeskripsi" rows="2" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"></textarea>
                 </div>
 
+                {{-- JADWAL EKSTRAKURIKULER --}}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Hari Latihan</label>
+                        <select name="hari" id="inputHari" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all bg-white">
+                            <option value="">-- Pilih Hari --</option>
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                            <option value="Sabtu">Sabtu</option>
+                            <option value="Minggu">Minggu</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Tanggal Masuk / Mulai</label>
+                        <input type="date" name="tanggal_mulai" id="inputTanggalMulai" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Jam Mulai</label>
+                        <input type="time" name="jam_mulai" id="inputJamMulai" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Jam Selesai</label>
+                        <input type="time" name="jam_selesai" id="inputJamSelesai" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    </div>
+                </div>
+              
+
+                {{-- KUOTA & STATUS --}}
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Kuota <span class="text-rose-500">*</span></label>
@@ -219,17 +270,42 @@
 
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Pembina / Pelatih</label>
-                    <select name="pembina_id" id="inputPembina" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all bg-white">
+                    <select name="pembina_id" id="inputPembina"
+                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm bg-white">
+
                         <option value="">-- Pilih Pembina --</option>
+
                         @foreach($pembinas as $pembina)
-                            <option value="{{ $pembina->id }}">{{ $pembina->nama }}</option>
+                            <option value="{{ $pembina->id }}">
+                                {{ $pembina->nama }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
 
+                {{-- BANNER UPLOAD --}}
                 <div>
-                    <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Foto Banner (Opsional)</label>
+                    <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Foto Banner / Cover (Opsional)</label>
                     <input type="file" name="foto" id="inputFoto" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition-all cursor-pointer border border-gray-300 rounded-xl">
+                    
+                    {{-- Preview Banner Lama --}}
+                    <div id="previewFotoContainer" class="mt-2 hidden">
+                        <span class="text-[10px] text-gray-400 mb-1 block">Banner saat ini:</span>
+                        <img id="previewFoto" src="" alt="Preview Banner" class="h-20 w-full rounded-lg object-cover border border-gray-200 shadow-sm">
+                    </div>
+                </div>
+
+                {{-- LOGO UPLOAD --}}
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Logo / Ikon Bulat (Opsional)</label>
+                    <p class="text-[10px] text-gray-500 mb-2">Gunakan gambar persegi (1:1) agar hasil bulat sempurna.</p>
+                    <input type="file" name="logo" id="inputLogo" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer border border-gray-300 rounded-xl">
+
+                    {{-- Preview Logo Lama --}}
+                    <div id="previewLogoContainer" class="mt-2 hidden">
+                        <span class="text-[10px] text-gray-400 mb-1 block">Logo saat ini:</span>
+                        <img id="previewLogo" src="" alt="Preview Logo" class="h-14 w-14 rounded-full object-cover border border-gray-200 shadow-sm">
+                    </div>
                 </div>
             </div>
 
@@ -248,6 +324,12 @@
     const form = document.getElementById('crudForm');
     const modalTitle = document.getElementById('modalTitle');
     const methodField = document.getElementById('methodField');
+    
+    // Element untuk preview gambar
+    const previewFotoContainer = document.getElementById('previewFotoContainer');
+    const previewFoto = document.getElementById('previewFoto');
+    const previewLogoContainer = document.getElementById('previewLogoContainer');
+    const previewLogo = document.getElementById('previewLogo');
 
     function openModal() {
         modal.classList.remove('hidden');
@@ -262,6 +344,10 @@
         form.action = "{{ route('admin.adexstra.store') }}";
         form.reset();
         methodField.innerHTML = '';
+        
+        // Sembunyikan preview gambar
+        previewFotoContainer.classList.add('hidden');
+        previewLogoContainer.classList.add('hidden');
     }
 
     function closeModal() {
@@ -274,6 +360,9 @@
         }, 300);
     }
 
+    // ==========================================
+    // FUNGSI EDIT MODAL (SUDAH DIPERBAIKI)
+    // ==========================================
     function editModal(data) {
         openModal(); 
         modalTitle.innerText = 'Edit Ekstrakurikuler';
@@ -281,17 +370,52 @@
         form.action = `/admin/adexstra/${data.id}`;
         methodField.innerHTML = '@method("PUT")';
 
+        // 1. Isi field teks & angka
         document.getElementById('inputNama').value = data.nama;
         document.getElementById('inputDeskripsi').value = data.deskripsi || '';
         document.getElementById('inputKuota').value = data.kuota;
+        
+        // 2. Isi Dropdown Status
         document.getElementById('inputStatus').value = data.status;
-        document.getElementById('inputPembina').value = data.pembina_id || '';
+
+        // 3. Isi Dropdown Pembina (Gunakan String untuk memastikan value cocok)
+        document.getElementById('inputPembina').value = data.pembina_id ? String(data.pembina_id) : '';
+
+        // 4. Isi Jadwal
+        document.getElementById('inputHari').value = data.hari || '';
+        document.getElementById('inputTanggalMulai').value = data.tanggal_mulai || '';
+        document.getElementById('inputJamMulai').value = data.jam_mulai || '';
+        document.getElementById('inputJamSelesai').value = data.jam_selesai || '';
+
+        // 5. Tampilkan Preview Foto & Logo
+        if(data.foto) {
+            previewFoto.src = `/storage/${data.foto}`;
+            previewFotoContainer.classList.remove('hidden');
+        } else {
+            previewFotoContainer.classList.add('hidden');
+        }
+
+        if(data.logo) {
+            previewLogo.src = `/storage/${data.logo}`;
+            previewLogoContainer.classList.remove('hidden');
+        } else {
+            previewLogoContainer.classList.add('hidden');
+        }
     }
 
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             closeModal();
         }
+    });
+
+    // ==========================================
+    // FITUR OTOMATIS HURUF BESAR SEMUA (UPPERCASE)
+    // ==========================================
+    const inputNama = document.getElementById('inputNama');
+    inputNama.addEventListener('input', function(e) {
+        // Mengubah semua huruf yang diketik menjadi kapital
+        e.target.value = e.target.value.toUpperCase();
     });
 </script>
 @endsection

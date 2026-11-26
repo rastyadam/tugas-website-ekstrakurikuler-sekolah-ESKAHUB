@@ -105,29 +105,29 @@
                         </td>
 
 
-                        {{-- BERKAS --}}
-                        <td class="px-4 py-3">
+                     {{-- BERKAS --}}
+<td class="px-4 py-3">
+    @php
+        $detailBerkas = $p->detailPersyaratan
+            ->filter(fn($detail) => !empty($detail->berkas_siswa) || !empty($detail->berkas));
+    @endphp
 
-                            @if($p->detailPersyaratan && $p->detailPersyaratan->berkas)
+    @forelse($detailBerkas as $detail)
+        @php
+            $file = $detail->berkas_siswa ?? $detail->berkas;
+        @endphp
 
-                                <a href="{{ asset('storage/' . $p->detailPersyaratan->berkas) }}"
-                                   target="_blank"
-                                   class="text-xs font-medium text-slate-700 hover:text-amber-700 underline underline-offset-2">
-
-                                    Lihat Berkas
-
-                                </a>
-
-                            @else
-
-                                <span class="text-xs text-gray-400">
-                                    -
-                                </span>
-
-                            @endif
-
-                        </td>
-
+        <div class="mb-1">
+            <a href="{{ asset('storage/' . $file) }}"
+               target="_blank"
+               class="text-xs font-medium text-slate-700 hover:text-amber-700 underline underline-offset-2">
+                {{ $detail->persyaratan->nama ?? 'Lihat Berkas' }}
+            </a>
+        </div>
+    @empty
+        <span class="text-xs text-gray-400">Belum ada berkas</span>
+    @endforelse
+</td>
 
                         {{-- TANGGAL --}}
                         <td class="px-4 py-3 text-xs text-gray-600">

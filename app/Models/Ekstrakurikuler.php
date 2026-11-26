@@ -18,6 +18,11 @@ class Ekstrakurikuler extends Model
         'kuota',
         'status',
         'pembina_id',
+        'logo', 
+        'hari',
+         'tanggal_mulai',
+          'jam_mulai',
+           'jam_selesai'
     ];
 
     // Relasi ke Pembina
@@ -33,4 +38,12 @@ public function jadwalLatihan()
 {
     return $this->hasMany(JadwalLatihan::class, 'ekstrakurikuler_id');
 }
+public function persyaratan()
+{
+    return $this->hasMany(
+        Persyaratan::class,
+        'ekstrakurikuler_id'
+    );
+}
+
 }

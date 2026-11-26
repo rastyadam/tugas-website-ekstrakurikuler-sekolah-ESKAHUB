@@ -152,12 +152,28 @@ class AuthController extends Controller
         ->with('success', 'Akun berhasil dibuat! Silakan login.');
 }
 
-    // ================= LOGOUT =================
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/');
-    }
+   // ================= LOGOUT =================
+public function logout(Request $request)
+{
+    // Ambil data pengguna sebelum logout
+    $user = Auth::user();
+
+    // Tentukan halaman login berdasarkan peran
+    $redirect = match ($user->peran ?? null) {
+        'admin'  => route('admin.login'),
+        'pembina' => route('login.pembina'),
+        'siswa'  => route('student.login'),
+        default  => route('student.login'),
+    };
+
+    // Logout pengguna
+    Auth::logout();
+
+    // Hapus session
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    // Kembali ke halaman login sesuai role
+    return redirect($redirect);
+}
 }
