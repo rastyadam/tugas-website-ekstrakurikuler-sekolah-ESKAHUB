@@ -7,8 +7,8 @@
     <div class="max-w-4xl mx-auto">
 
         {{-- Tombol Kembali --}}
-        <a href="{{ route('student.profil') }}" class="inline-flex items-center gap-2 text-slate-700 font-medium text-sm mb-6 hover:text-slate-900 transition">
-            <i class="fa-solid fa-arrow-left"></i> Kembali ke Profil
+        <a href="{{ route('student.beranda') }}" class="inline-flex items-center gap-2 text-slate-700 font-medium text-sm mb-6 hover:text-slate-900 transition">
+            <i class="fa-solid fa-arrow-left"></i> Kembali ke beranda
         </a>
 
         {{-- Header --}}

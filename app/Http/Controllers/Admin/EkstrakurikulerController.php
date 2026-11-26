@@ -57,9 +57,8 @@ class EkstrakurikulerController extends Controller
             'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi logo
             'hari' => 'nullable|string|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
-            'tanggal_mulai' => 'nullable|date',
-            'jam_mulai' => 'nullable|date_format:H:i',
-            'jam_selesai' => 'nullable|date_format:H:i|after:jam_mulai',
+           'jam_mulai' => 'nullable|date_format:H:i:s',
+'jam_selesai' => 'nullable|date_format:H:i:s|after:jam_mulai',
         ]);
 
         $data = $request->all();
@@ -80,45 +79,63 @@ class EkstrakurikulerController extends Controller
     }
 
     // 3. UPDATE DATA
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'kuota' => 'required|integer|min:1',
-            'status' => 'required|in:aktif,nonaktif',
-            'pembina_id' => 'nullable|exists:pembina,id',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
-            'hari' => 'nullable|string|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
-    'tanggal_mulai' => 'nullable|date',
+    
+public function update(Request $request, $id)
+{
+    $validated = $request->validate([
+        'nama' => 'required|string|max:255',
+        'deskripsi' => 'nullable|string',
+        'kuota' => 'required|integer|min:1',
+        'status' => 'required|in:aktif,nonaktif',
+        'pembina_id' => 'nullable|exists:pembina,id',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'hari' => 'nullable|string|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+        'tanggal_mulai' => 'nullable|date',
     'jam_mulai' => 'nullable|date_format:H:i',
-    'jam_selesai' => 'nullable|date_format:H:i|after:jam_mulai',
-        ]);
+'jam_selesai' => 'nullable|date_format:H:i|after:jam_mulai',
+    ]);
 
-        $ekskul = Ekstrakurikuler::findOrFail($id);
-        $data = $request->all();
+    $ekskul = Ekstrakurikuler::findOrFail($id);
 
-        // Handle update banner (foto)
-        if ($request->hasFile('foto')) {
-            if ($ekskul->foto && Storage::disk('public')->exists($ekskul->foto)) {
-                Storage::disk('public')->delete($ekskul->foto);
-            }
-            $data['foto'] = $request->file('foto')->store('ekstrakurikuler/banner', 'public');
+    // Pastikan pembina_id ikut disimpan
+    $data = [
+        'nama' => $validated['nama'],
+        'deskripsi' => $validated['deskripsi'] ?? null,
+        'kuota' => $validated['kuota'],
+        'status' => $validated['status'],
+        'pembina_id' => $validated['pembina_id'] ?? null,
+        'hari' => $validated['hari'] ?? null,
+        'tanggal_mulai' => $validated['tanggal_mulai'] ?? null,
+        'jam_mulai' => $validated['jam_mulai'] ?? null,
+        'jam_selesai' => $validated['jam_selesai'] ?? null,
+    ];
+
+    // Update foto banner
+    if ($request->hasFile('foto')) {
+        if ($ekskul->foto && Storage::disk('public')->exists($ekskul->foto)) {
+            Storage::disk('public')->delete($ekskul->foto);
         }
 
-        // Handle update logo
-        if ($request->hasFile('logo')) {
-            if ($ekskul->logo && Storage::disk('public')->exists($ekskul->logo)) {
-                Storage::disk('public')->delete($ekskul->logo);
-            }
-            $data['logo'] = $request->file('logo')->store('ekstrakurikuler/logo', 'public');
-        }
-
-        $ekskul->update($data);
-
-        return redirect()->route('admin.adexstra')->with('success', 'Data berhasil diperbarui!');
+        $data['foto'] = $request->file('foto')->store('ekstrakurikuler/banner', 'public');
     }
+
+    // Update logo
+    if ($request->hasFile('logo')) {
+        if ($ekskul->logo && Storage::disk('public')->exists($ekskul->logo)) {
+            Storage::disk('public')->delete($ekskul->logo);
+        }
+
+        $data['logo'] = $request->file('logo')->store('ekstrakurikuler/logo', 'public');
+    }
+
+    $ekskul->update($data);
+
+    return redirect()
+        ->route('admin.adexstra')
+        ->with('success', 'Data ekstrakurikuler berhasil diperbarui!');
+}
+
 
     // 4. HAPUS DATA
     public function destroy($id)

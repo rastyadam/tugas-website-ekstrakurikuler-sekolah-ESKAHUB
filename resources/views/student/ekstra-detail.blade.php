@@ -168,29 +168,33 @@
                     </div>
                 </div>
 
-                {{-- Card 2: Persyaratan --}}
-                <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
-                    <h3 class="text-base font-bold text-slate-900">Persyaratan</h3>
+              
+<div class="space-y-3">
+    @forelse ($persyaratans as $persyaratan)
+        <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
 
-                    <ul class="space-y-3.5 text-xs text-slate-700">
-                        <li class="flex items-start gap-3">
-                            <i class="fa-regular fa-circle-check text-slate-800 text-sm mt-0.5"></i>
-                            <span>Siswa/i aktif kelas X atau XI</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fa-regular fa-circle-check text-slate-800 text-sm mt-0.5"></i>
-                            <span>Sehat jasmani dan rohani</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fa-regular fa-circle-check text-slate-800 text-sm mt-0.5"></i>
-                            <span>Memiliki sepatu olahraga</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fa-regular fa-circle-check text-slate-800 text-sm mt-0.5"></i>
-                            <span>Berkomitmen hadir latihan</span>
-                        </li>
-                    </ul>
-                </div>
+            <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-800">
+                    {{ $persyaratan->nama }}
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    {{ ucfirst(strtolower($persyaratan->tipe_persyaratan)) }}
+                    ·
+                    {{ ucfirst($persyaratan->status) }}
+                </p>
+            </div>
+        </div>
+    @empty
+        <p class="text-sm text-gray-500">
+            Belum ada persyaratan yang tersedia.
+        </p>
+    @endforelse
+</div>
+
 
             </div>
 

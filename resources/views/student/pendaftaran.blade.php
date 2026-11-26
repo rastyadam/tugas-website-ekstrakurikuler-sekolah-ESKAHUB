@@ -1,5 +1,5 @@
 {{-- SECTION PENDAFTARAN --}}
-<section id="pendaftaran" class="bg-white px-6 py-16 lg:px-8">
+<section id="pendaftaran" class="scroll-mt-20 bg-white px-6 py-16 lg:px-8">
 
     <div class="mx-auto max-w-7xl">
 
@@ -69,13 +69,22 @@
                             1 – 15 Juli 2026
                         </p>
 
-                        <a
-                            href="#ekstra"
-                            class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#f6bd24] px-5 py-3 text-sm font-bold text-[#182635] transition hover:bg-[#e4ae1e]"
-                        >
-                            Mulai Pendaftaran
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
-                        </a>
+                       <a href="#ekstra"
+   onclick="event.preventDefault(); document.getElementById('ekstra').scrollIntoView({ behavior: 'smooth', block: 'start' });"
+   class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-[#ffb703] px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-lg hover:bg-amber-400 transition-all duration-200">
+
+    <span>Daftar Sekarang</span>
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="h-4 w-4"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor"
+         stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+    </svg>
+</a>
 
                     </div>
 

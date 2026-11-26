@@ -12,6 +12,17 @@
 @endsection
 
 @section('content')
+  @if ($errors->any())
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+        <p class="font-bold mb-2">Terjadi kesalahan:</p>
+
+        <ul class="list-disc pl-5">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <div class="mt-4 space-y-6 relative">
 
     {{-- ALERT SUCCESS --}}
@@ -142,7 +153,12 @@
                     {{-- Aksi --}}
                     <td class="py-4 px-4 text-right">
                         <div class="inline-flex items-center gap-3 font-medium text-xs">
-                            <button onclick="editModal({{ $ekskul }})" class="text-blue-600 hover:text-blue-800">Ubah</button>
+                            <button
+                                type="button"
+                                onclick="editModal(@js($ekskul))"
+                                class="text-blue-600 hover:text-blue-800">
+                                Ubah
+                            </button>
                             <form action="{{ route('admin.adexstra.destroy', $ekskul->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus ekstrakurikuler ini?')">
                                 @csrf
                                 @method('DELETE')
@@ -196,7 +212,7 @@
             <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Nama Ekstrakurikuler <span class="text-rose-500">*</span></label>
-                    <input type="text" name="nama" id="inputNama" required class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
+                    <input type="text" name="nama" id="inputNama" required class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all uppercase" placeholder="CONTOH: BASKET">
                 </div>
                 
                 <div>
@@ -235,6 +251,7 @@
                         <input type="time" name="jam_selesai" id="inputJamSelesai" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all">
                     </div>
                 </div>
+              
 
                 {{-- KUOTA & STATUS --}}
                 <div class="grid grid-cols-2 gap-4">
@@ -253,10 +270,15 @@
 
                 <div>
                     <label class="block text-[11px] font-bold text-gray-700 uppercase tracking-wide mb-1.5">Pembina / Pelatih</label>
-                    <select name="pembina_id" id="inputPembina" class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all bg-white">
+                    <select name="pembina_id" id="inputPembina"
+                        class="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm bg-white">
+
                         <option value="">-- Pilih Pembina --</option>
+
                         @foreach($pembinas as $pembina)
-                            <option value="{{ $pembina->id }}">{{ $pembina->nama }}</option>
+                            <option value="{{ $pembina->id }}">
+                                {{ $pembina->nama }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -338,6 +360,9 @@
         }, 300);
     }
 
+    // ==========================================
+    // FUNGSI EDIT MODAL (SUDAH DIPERBAIKI)
+    // ==========================================
     function editModal(data) {
         openModal(); 
         modalTitle.innerText = 'Edit Ekstrakurikuler';
@@ -345,19 +370,24 @@
         form.action = `/admin/adexstra/${data.id}`;
         methodField.innerHTML = '@method("PUT")';
 
+        // 1. Isi field teks & angka
         document.getElementById('inputNama').value = data.nama;
         document.getElementById('inputDeskripsi').value = data.deskripsi || '';
         document.getElementById('inputKuota').value = data.kuota;
+        
+        // 2. Isi Dropdown Status
         document.getElementById('inputStatus').value = data.status;
-        document.getElementById('inputPembina').value = data.pembina_id || '';
 
-        // Tampilkan jadwal (jika ada)
+        // 3. Isi Dropdown Pembina (Gunakan String untuk memastikan value cocok)
+        document.getElementById('inputPembina').value = data.pembina_id ? String(data.pembina_id) : '';
+
+        // 4. Isi Jadwal
         document.getElementById('inputHari').value = data.hari || '';
         document.getElementById('inputTanggalMulai').value = data.tanggal_mulai || '';
         document.getElementById('inputJamMulai').value = data.jam_mulai || '';
         document.getElementById('inputJamSelesai').value = data.jam_selesai || '';
 
-        // Tampilkan Preview Banner jika ada
+        // 5. Tampilkan Preview Foto & Logo
         if(data.foto) {
             previewFoto.src = `/storage/${data.foto}`;
             previewFotoContainer.classList.remove('hidden');
@@ -365,7 +395,6 @@
             previewFotoContainer.classList.add('hidden');
         }
 
-        // Tampilkan Preview Logo jika ada
         if(data.logo) {
             previewLogo.src = `/storage/${data.logo}`;
             previewLogoContainer.classList.remove('hidden');
@@ -381,16 +410,12 @@
     });
 
     // ==========================================
-    // FITUR OTOMATIS HURUF BESAR DI AWAL KATA
+    // FITUR OTOMATIS HURUF BESAR SEMUA (UPPERCASE)
     // ==========================================
     const inputNama = document.getElementById('inputNama');
     inputNama.addEventListener('input', function(e) {
-        let value = e.target.value;
-        // Mengubah setiap awal kata menjadi huruf besar
-        let formatted = value.replace(/\w\S*/g, function(txt) {
-            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-        });
-        e.target.value = formatted;
+        // Mengubah semua huruf yang diketik menjadi kapital
+        e.target.value = e.target.value.toUpperCase();
     });
 </script>
 @endsection

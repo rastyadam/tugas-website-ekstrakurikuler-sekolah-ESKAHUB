@@ -38,4 +38,12 @@ public function jadwalLatihan()
 {
     return $this->hasMany(JadwalLatihan::class, 'ekstrakurikuler_id');
 }
+public function persyaratan()
+{
+    return $this->hasMany(
+        Persyaratan::class,
+        'ekstrakurikuler_id'
+    );
+}
+
 }

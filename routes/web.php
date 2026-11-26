@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Admin\DataSiswaController;
 use App\Http\Controllers\Admin\EkstrakurikulerController as AdminEkstrakurikulerController;
 use App\Http\Controllers\Admin\LaporanController;
@@ -15,6 +16,9 @@ use App\Http\Controllers\Siswa\BerandaController;
 use App\Http\Controllers\Siswa\EkstrakurikulerController as SiswaEkstrakurikulerController;
 use App\Http\Controllers\Siswa\PendaftaranController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/', [LandingController::class, 'index'])
+    ->name('landing');
 
 // =========================
 // ADMIN
@@ -66,6 +70,21 @@ Route::middleware(['auth', 'wajib.ganti', 'role:pembina'])->prefix('pembina')->n
      // Atur Jadwal Seleksi
     Route::post('/pendaftar/{id}/jadwal', [PembinaDashboard::class, 'simpanJadwalSeleksi'])->name('pendaftar.jadwal');
     
+
+// KELOLA PERSYARATAN
+Route::get('/persyaratan', [PembinaDashboard::class, 'persyaratan'])
+    ->name('persyaratan');
+
+Route::post('/persyaratan', [PembinaDashboard::class, 'simpanPersyaratan'])
+    ->name('persyaratan.store');
+
+Route::put('/persyaratan/{id}', [PembinaDashboard::class, 'updatePersyaratan'])
+    ->name('persyaratan.update');
+
+Route::delete('/persyaratan/{id}', [PembinaDashboard::class, 'hapusPersyaratan'])
+    ->name('persyaratan.destroy');
+
+
     // Terima Langsung (Tanpa Seleksi)
     Route::put('/pendaftar/{id}/terima-langsung', [PembinaDashboard::class, 'terimaLangsung'])->name('pendaftar.terima-langsung');
     Route::post('/pengumuman', [PembinaDashboard::class, 'simpanPengumuman'])->name('pengumuman.store');
@@ -118,6 +137,10 @@ Route::post('/register', [AuthController::class, 'register'])->name('student.reg
 Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('student.')->group(function () {
     
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
+   Route::get('/ekstra/load-more', [
+    SiswaEkstrakurikulerController::class,
+    'loadMore'
+])->name('ekstra.load-more');
     Route::view('/pengumuman', 'student.pengumuman')->name('pengumuman');
     
     Route::get('/ekstra', [SiswaEkstrakurikulerController::class, 'index'])->name('ekstra');
@@ -150,8 +173,8 @@ Route::get('/forgot-password', function () {
 // GANTI PASSWORD
 // =========================
 Route::middleware(['auth'])->group(function () {
-    Route::get('/ganti-password', [PasswordController::class, 'show'])->name('password.force');
-    Route::post('/ganti-password', [PasswordController::class, 'update'])->name('password.update');
+    Route::get('/ganti-password', [PembinaDashboard::class, 'showGantiPassword'])->name('password.force');
+    Route::post('/ganti-password', [PembinaDashboard::class, 'simpanGantiPassword'])->name('password.update');
 });
 
 
